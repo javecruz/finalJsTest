@@ -5,7 +5,8 @@ var clientList = (function() {
         getAll: function() {
             $.post(url + 'consulta.php', { submit: 1 }, function(data) {
                 data.forEach(function(elem) {
-                    clientes[elem.id] = Client(elem)
+                    //clientes[elem.id] = Client(elem) <---- FALLO, guarda donde indice = id
+                    clientes[clientes.length] = Client(elem)
                 })
                 events.publish("get-all", clientes);
                 events.publish('show-client', { cliente: null, aceptar: "Guardar cliente", title: "Añadir cliente nuevo", cerrar: "Cancelar" });
@@ -18,7 +19,17 @@ var clientList = (function() {
         },
         delete: function(id) {
             $.post(url + 'eliminar.php', { id: id }, function(data) {
-                clientes.splice(id, 1);
+
+                //  busco indice a partir del ID y borre ese
+                for(var i = 0;i<clientes.length;i++){
+                    if(clientes[i].id == id){
+                        clientes.splice(i, 1);
+                    }
+                }
+
+
+
+                //clientes.splice(id, 1);       <-----------  FALLO 
                 events.publish("get-all", clientes);
             }, "json")
         },
@@ -35,7 +46,8 @@ var clientList = (function() {
             json.submit = 1
             $.post(url + 'nuevo.php', json, function(data) {
                 json.id = data.id
-                clientes[json.id] = Client(json)
+                // clientes[json.id] = Client(json) FALLO
+                clientes[clientes.length] = Client(json)
                 events.publish("get-all", clientes);
             }, "json")
         },
